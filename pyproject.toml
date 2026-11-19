@@ -5,7 +5,9 @@ version = "0.1.0"
 description = "Local AI-powered document intelligence and summarization system"
 readme = "README.md"
 requires-python = ">=3.13,<3.14"
-dependencies = []
+dependencies = [
+    "pydantic-settings>=2.16.3",
+]
 
 [dependency-groups]
 dev = [
