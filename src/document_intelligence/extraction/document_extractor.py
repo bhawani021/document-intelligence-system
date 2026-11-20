@@ -4,6 +4,7 @@ from pathlib import Path
 import pymupdf
 from docx import Document
 
+from document_intelligence.extraction.text_cleaner import TextCleaner
 
 @dataclass
 class ExtractDocument:
@@ -16,6 +17,9 @@ class ExtractDocument:
 class DocumentExtractor:
     """Extracts text from supported document formats: PDF, DOCX and TXT."""
 
+    def __init__(self):
+        self.text_cleaner = TextCleaner()
+
     def extract(self, file_path: str | Path) -> ExtractDocument:
 
         path = Path(file_path)
@@ -26,15 +30,17 @@ class DocumentExtractor:
         extension = path.suffix.lower()
 
         if extension == ".pdf":
-            return self._extract_pdf(path)
+            result = self._extract_pdf(path)
+        elif extension == ".docx":
+            result =  self._extract_docx(path)
+        elif extension == ".txt":
+            result =  self._extract_txt(path)
+        else:
+            raise ValueError(f"Unsupported file format: {extension}")
 
-        if extension == ".docx":
-            return self._extract_docx(path)
+        result.text = self.text_cleaner.clean(result.text)
 
-        if extension == ".txt":
-            return self._extract_txt(path)
-
-        raise ValueError(f"Unsupported file format: {extension}")
+        return result
 
     def _extract_pdf(self, path: Path) -> ExtractDocument:
 
@@ -74,8 +80,3 @@ class DocumentExtractor:
             text=text,
             page_count=None,
         )
-
-
-
-
-
